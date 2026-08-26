@@ -1,0 +1,691 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6fb;
+    color: #222;
+}
+
+
+/* =================================
+   LOGIN / REGISTER
+================================= */
+
+.auth-body {
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: linear-gradient(
+        135deg,
+        #141e30,
+        #243b55
+    );
+}
+
+
+.auth-container {
+    width: 380px;
+
+    background: white;
+
+    padding: 40px;
+
+    border-radius: 18px;
+
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+
+    text-align: center;
+}
+
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+
+.auth-container h2 {
+    margin-bottom: 10px;
+}
+
+
+.subtitle {
+    color: #777;
+    margin-bottom: 25px;
+}
+
+
+.auth-container form {
+    text-align: left;
+}
+
+
+.auth-container label {
+    display: block;
+
+    margin-top: 15px;
+    margin-bottom: 7px;
+
+    font-weight: bold;
+}
+
+
+.auth-container input {
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+}
+
+
+button {
+    border: none;
+
+    cursor: pointer;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+}
+
+
+.auth-container button {
+    width: 100%;
+
+    margin-top: 25px;
+
+    padding: 13px;
+
+    background: #6c5ce7;
+
+    color: white;
+
+    font-weight: bold;
+}
+
+
+.auth-container button:hover {
+    background: #5545d4;
+}
+
+
+.account-text {
+    margin-top: 20px;
+
+    color: #666;
+}
+
+
+.account-text a {
+    color: #6c5ce7;
+
+    font-weight: bold;
+
+    text-decoration: none;
+}
+
+
+.message {
+    background: #eef0ff;
+
+    color: #5145cd;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    margin-bottom: 15px;
+}
+
+
+/* =================================
+   NAVBAR
+================================= */
+
+.navbar {
+    height: 70px;
+
+    background: #171725;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 7%;
+}
+
+
+.nav-logo {
+    font-size: 24px;
+
+    font-weight: bold;
+}
+
+
+.nav-links {
+    display: flex;
+
+    align-items: center;
+
+    gap: 25px;
+}
+
+
+.nav-links a {
+    color: white;
+
+    text-decoration: none;
+}
+
+
+.logout-btn {
+    background: #e74c3c;
+
+    padding: 9px 15px;
+
+    border-radius: 7px;
+}
+
+
+/* =================================
+   HERO
+================================= */
+
+.hero {
+    background: linear-gradient(
+        135deg,
+        #6c5ce7,
+        #8e44ad
+    );
+
+    color: white;
+
+    padding: 55px 7%;
+
+    text-align: center;
+}
+
+
+.hero h1 {
+    font-size: 38px;
+
+    margin-bottom: 12px;
+}
+
+
+.hero p {
+    font-size: 17px;
+
+    margin-bottom: 30px;
+}
+
+
+.search-box {
+    max-width: 650px;
+
+    margin: auto;
+
+    display: flex;
+
+    background: white;
+
+    padding: 6px;
+
+    border-radius: 10px;
+}
+
+
+.search-box input {
+    flex: 1;
+
+    border: none;
+
+    outline: none;
+
+    padding: 12px;
+
+    font-size: 15px;
+}
+
+
+.search-box button {
+    background: #171725;
+
+    color: white;
+
+    padding: 0 20px;
+}
+
+
+/* =================================
+   GAMES
+================================= */
+
+.container {
+    width: 86%;
+
+    max-width: 1200px;
+
+    margin: 40px auto;
+}
+
+
+.section-title {
+    margin-bottom: 25px;
+
+    font-size: 28px;
+}
+
+
+.game-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(280px, 1fr));
+
+    gap: 25px;
+}
+
+
+.game-card {
+    background: white;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+
+    transition: 0.3s;
+}
+
+
+.game-card:hover {
+    transform: translateY(-6px);
+
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+
+.game-image {
+    height: 180px;
+
+    background: linear-gradient(
+        135deg,
+        #667eea,
+        #764ba2
+    );
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+}
+
+
+.game-icon {
+    font-size: 75px;
+}
+
+
+.game-content {
+    padding: 22px;
+}
+
+
+.game-content h3 {
+    font-size: 22px;
+
+    margin-bottom: 8px;
+}
+
+
+.genre {
+    display: inline-block;
+
+    background: #eeeaff;
+
+    color: #5d4bd8;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    font-size: 13px;
+
+    margin-bottom: 12px;
+}
+
+
+.game-content p {
+    color: #666;
+
+    line-height: 1.5;
+
+    margin-bottom: 15px;
+}
+
+
+.rating {
+    font-size: 16px;
+
+    margin-bottom: 18px;
+}
+
+
+.review-count {
+    color: #888;
+
+    font-size: 13px;
+}
+
+
+.rate-button {
+    display: block;
+
+    text-align: center;
+
+    background: #6c5ce7;
+
+    color: white;
+
+    padding: 11px;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+}
+
+
+.rate-button:hover {
+    background: #5545d4;
+}
+
+
+.no-games {
+    text-align: center;
+
+    padding: 50px;
+
+    background: white;
+
+    border-radius: 15px;
+}
+
+
+/* =================================
+   GAME DETAILS
+================================= */
+
+.game-detail-container {
+    width: 80%;
+
+    max-width: 900px;
+
+    margin: 40px auto;
+}
+
+
+.game-detail-card {
+    display: flex;
+
+    gap: 35px;
+
+    background: white;
+
+    padding: 35px;
+
+    border-radius: 18px;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+
+    margin-bottom: 30px;
+}
+
+
+.large-game-icon {
+    width: 220px;
+
+    height: 220px;
+
+    flex-shrink: 0;
+
+    background: linear-gradient(
+        135deg,
+        #667eea,
+        #764ba2
+    );
+
+    border-radius: 15px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    font-size: 90px;
+}
+
+
+.game-info h1 {
+    font-size: 35px;
+
+    margin-bottom: 10px;
+}
+
+
+.game-info p {
+    color: #666;
+
+    line-height: 1.6;
+
+    margin: 15px 0;
+}
+
+
+.big-rating {
+    font-size: 25px;
+
+    margin-top: 20px;
+}
+
+
+/* =================================
+   REVIEW FORM
+================================= */
+
+.review-form {
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 15px;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+
+    margin-bottom: 30px;
+}
+
+
+.review-form h2 {
+    margin-bottom: 20px;
+}
+
+
+.star-rating {
+    display: flex;
+
+    flex-direction: row-reverse;
+
+    justify-content: flex-end;
+
+    margin-bottom: 20px;
+}
+
+
+.star-rating input {
+    display: none;
+}
+
+
+.star-rating label {
+    font-size: 35px;
+
+    color: #ccc;
+
+    cursor: pointer;
+}
+
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #f1c40f;
+}
+
+
+.star-rating input:checked ~ label {
+    color: #f1c40f;
+}
+
+
+.review-form textarea {
+    width: 100%;
+
+    padding: 15px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+
+    resize: vertical;
+
+    font-family: Arial;
+
+    font-size: 15px;
+
+    margin-bottom: 15px;
+}
+
+
+.review-form button {
+    background: #6c5ce7;
+
+    color: white;
+
+    padding: 12px 25px;
+}
+
+
+.review-form button:hover {
+    background: #5545d4;
+}
+
+
+/* =================================
+   REVIEWS
+================================= */
+
+.reviews-section h2 {
+    margin-bottom: 20px;
+}
+
+
+.review-card {
+    background: white;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    margin-bottom: 15px;
+
+    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+}
+
+
+.review-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+}
+
+
+.review-card p {
+    color: #555;
+
+    line-height: 1.5;
+
+    margin-bottom: 10px;
+}
+
+
+.review-card small {
+    color: #999;
+}
+
+
+.no-reviews {
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    color: #777;
+}
+
+
+/* =================================
+   MOBILE
+================================= */
+
+@media (max-width: 700px) {
+
+    .navbar {
+        padding: 0 20px;
+    }
+
+    .nav-links span {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .game-detail-card {
+        flex-direction: column;
+    }
+
+    .large-game-icon {
+        width: 100%;
+    }
+
+    .game-detail-container {
+        width: 92%;
+    }
+
+}

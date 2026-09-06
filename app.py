@@ -1,20 +1,27 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import mysql.connector
+import os
 
 app = Flask(__name__)
-app.secret_key = "gkb_project_secret_key"
+
+# Secret key
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "gkb_project_secret_key"
+)
 
 
 # =========================================================
-# DATABASE CONNECTION
+# DATABASE CONNECTION - TiDB CLOUD
 # =========================================================
 
 def get_db_connection():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="PASSWORD",
-        database="registration_db"
+        host=os.environ.get("TIDB_HOST"),
+        port=int(os.environ.get("TIDB_PORT", "4000")),
+        user=os.environ.get("TIDB_USER"),
+        password=os.environ.get("TIDB_PASSWORD"),
+        database=os.environ.get("TIDB_DATABASE")
     )
 
 
@@ -23,9 +30,13 @@ def get_db_connection():
 # =========================================================
 
 @app.route("/")
+def home():
+    return redirect(url_for("login"))
+
+
 @app.route("/login")
 def login():
-    # If already logged in, go to dashboard
+
     if "user_id" in session:
         return redirect(url_for("dashboard"))
 
@@ -50,6 +61,7 @@ def login_user():
     cursor = None
 
     try:
+
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
 
@@ -63,7 +75,7 @@ def login_user():
         user = cursor.fetchone()
 
         if user:
-            # Store login information in session
+
             session["user_id"] = user["id"]
             session["username"] = user["username"]
             session["email"] = user["email"]
@@ -71,17 +83,21 @@ def login_user():
             return redirect(url_for("dashboard"))
 
         else:
+
             flash("Invalid email or password.")
             return redirect(url_for("login"))
 
     except mysql.connector.Error as error:
-        print("MySQL Error:", error)
+
+        print("Database Error:", error)
         flash("Database connection error.")
         return redirect(url_for("login"))
 
     finally:
+
         if cursor:
             cursor.close()
+
         if db:
             db.close()
 
@@ -111,6 +127,7 @@ def register_user():
     password = request.form.get("password")
 
     if not username or not email or not password:
+
         flash("Please fill all the fields.")
         return redirect(url_for("register"))
 
@@ -118,10 +135,11 @@ def register_user():
     cursor = None
 
     try:
+
         db = get_db_connection()
         cursor = db.cursor()
 
-        # Check whether email already exists
+        # Check existing email
         cursor.execute(
             "SELECT id FROM users WHERE email = %s",
             (email,)
@@ -130,6 +148,7 @@ def register_user():
         existing_user = cursor.fetchone()
 
         if existing_user:
+
             flash("Email already registered. Please login.")
             return redirect(url_for("login"))
 
@@ -150,13 +169,16 @@ def register_user():
         return redirect(url_for("login"))
 
     except mysql.connector.Error as error:
-        print("MySQL Error:", error)
+
+        print("Database Error:", error)
         flash("Database connection error.")
         return redirect(url_for("register"))
 
     finally:
+
         if cursor:
             cursor.close()
+
         if db:
             db.close()
 
@@ -168,8 +190,8 @@ def register_user():
 @app.route("/dashboard")
 def dashboard():
 
-    # User must be logged in
     if "user_id" not in session:
+
         flash("Please login first.")
         return redirect(url_for("login"))
 
@@ -179,61 +201,48 @@ def dashboard():
     cursor = None
 
     try:
+
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
 
+        query = """
+            SELECT
+                g.id,
+                g.name,
+                g.genre,
+                g.description,
+                COALESCE(AVG(r.rating), 0) AS rating,
+                COUNT(r.id) AS review_count
+            FROM games g
+            LEFT JOIN reviews r
+                ON g.id = r.game_id
+        """
+
         if search:
 
-            query = """
-                SELECT
-                    g.id,
-                    g.name,
-                    g.genre,
-                    g.description,
-                    COALESCE(AVG(r.rating), 0) AS rating,
-                    COUNT(r.id) AS review_count
-                FROM games g
-                LEFT JOIN reviews r
-                    ON g.id = r.game_id
+            query += """
                 WHERE g.name LIKE %s
                    OR g.genre LIKE %s
-                GROUP BY
-                    g.id,
-                    g.name,
-                    g.genre,
-                    g.description
-                ORDER BY rating DESC
             """
 
             search_value = "%" + search + "%"
 
-            cursor.execute(
-                query,
-                (search_value, search_value)
-            )
+            params = (search_value, search_value)
 
         else:
 
-            query = """
-                SELECT
-                    g.id,
-                    g.name,
-                    g.genre,
-                    g.description,
-                    COALESCE(AVG(r.rating), 0) AS rating,
-                    COUNT(r.id) AS review_count
-                FROM games g
-                LEFT JOIN reviews r
-                    ON g.id = r.game_id
-                GROUP BY
-                    g.id,
-                    g.name,
-                    g.genre,
-                    g.description
-                ORDER BY rating DESC
-            """
+            params = ()
 
-            cursor.execute(query)
+        query += """
+            GROUP BY
+                g.id,
+                g.name,
+                g.genre,
+                g.description
+            ORDER BY rating DESC
+        """
+
+        cursor.execute(query, params)
 
         games = cursor.fetchall()
 
@@ -245,13 +254,16 @@ def dashboard():
         )
 
     except mysql.connector.Error as error:
-        print("MySQL Error:", error)
+
+        print("Database Error:", error)
         flash("Unable to load games.")
         return redirect(url_for("login"))
 
     finally:
+
         if cursor:
             cursor.close()
+
         if db:
             db.close()
 
@@ -264,6 +276,7 @@ def dashboard():
 def game_details(game_id):
 
     if "user_id" not in session:
+
         flash("Please login first.")
         return redirect(url_for("login"))
 
@@ -271,6 +284,7 @@ def game_details(game_id):
     cursor = None
 
     try:
+
         db = get_db_connection()
         cursor = db.cursor(dictionary=True)
 
@@ -298,6 +312,7 @@ def game_details(game_id):
         game = cursor.fetchone()
 
         if not game:
+
             flash("Game not found.")
             return redirect(url_for("dashboard"))
 
@@ -326,13 +341,16 @@ def game_details(game_id):
         )
 
     except mysql.connector.Error as error:
-        print("MySQL Error:", error)
+
+        print("Database Error:", error)
         flash("Unable to load game details.")
         return redirect(url_for("dashboard"))
 
     finally:
+
         if cursor:
             cursor.close()
+
         if db:
             db.close()
 
@@ -345,6 +363,7 @@ def game_details(game_id):
 def rate_game(game_id):
 
     if "user_id" not in session:
+
         flash("Please login first.")
         return redirect(url_for("login"))
 
@@ -352,42 +371,58 @@ def rate_game(game_id):
     review = request.form.get("review", "").strip()
 
     if not rating:
+
         flash("Please select a rating.")
-        return redirect(url_for("game_details", game_id=game_id))
+        return redirect(
+            url_for("game_details", game_id=game_id)
+        )
 
     try:
-        rating = int(rating)
-    except ValueError:
-        flash("Invalid rating.")
-        return redirect(url_for("game_details", game_id=game_id))
 
-    # Rating must be between 1 and 5
+        rating = int(rating)
+
+    except ValueError:
+
+        flash("Invalid rating.")
+        return redirect(
+            url_for("game_details", game_id=game_id)
+        )
+
+    # Rating must be 1-5
     if rating < 1 or rating > 5:
+
         flash("Rating must be between 1 and 5.")
-        return redirect(url_for("game_details", game_id=game_id))
+        return redirect(
+            url_for("game_details", game_id=game_id)
+        )
 
     db = None
     cursor = None
 
     try:
+
         db = get_db_connection()
         cursor = db.cursor()
 
-        # Check whether this user already reviewed this game
+        # Check existing review
         cursor.execute(
             """
             SELECT id
             FROM reviews
-            WHERE user_id = %s AND game_id = %s
+            WHERE user_id = %s
+              AND game_id = %s
             """,
-            (session["user_id"], game_id)
+            (
+                session["user_id"],
+                game_id
+            )
         )
 
         existing_review = cursor.fetchone()
 
         if existing_review:
 
-            # Update existing review
+            # Update review
             cursor.execute(
                 """
                 UPDATE reviews
@@ -408,7 +443,7 @@ def rate_game(game_id):
 
         else:
 
-            # Add new review
+            # Insert new review
             cursor.execute(
                 """
                 INSERT INTO reviews
@@ -433,15 +468,19 @@ def rate_game(game_id):
         )
 
     except mysql.connector.Error as error:
-        print("MySQL Error:", error)
+
+        print("Database Error:", error)
         flash("Unable to submit review.")
+
         return redirect(
             url_for("game_details", game_id=game_id)
         )
 
     finally:
+
         if cursor:
             cursor.close()
+
         if db:
             db.close()
 
@@ -456,6 +495,7 @@ def logout():
     session.clear()
 
     flash("You have been logged out.")
+
     return redirect(url_for("login"))
 
 

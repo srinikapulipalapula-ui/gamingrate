@@ -1,0 +1,91 @@
+<html>
+
+<head>
+
+    <title>GameRate - Register</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body class="auth-body">
+
+<div class="auth-container">
+
+    <div class="logo">
+        🎮 GameRate
+    </div>
+
+    <h2>Create Account</h2>
+
+    <p class="subtitle">
+        Join the gaming community
+    </p>
+
+
+    {% with messages = get_flashed_messages() %}
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <form action="{{ url_for('register_user') }}" method="POST">
+
+        <label>Username</label>
+
+        <input type="text"
+               name="username"
+               placeholder="Enter username"
+               required>
+
+
+        <label>Email</label>
+
+        <input type="email"
+               name="email"
+               placeholder="Enter email"
+               required>
+
+
+        <label>Password</label>
+
+        <input type="password"
+               name="password"
+               placeholder="Enter password"
+               required>
+
+
+        <button type="submit">
+            Create Account
+        </button>
+
+    </form>
+
+
+    <p class="account-text">
+
+        Already have an account?
+
+        <a href="{{ url_for('login') }}">
+            Login
+        </a>
+
+    </p>
+
+</div>
+
+</body>
+
+</html>

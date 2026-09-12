@@ -110,9 +110,8 @@
             Rate This Game ⭐
         </h2>
 
-        <form action="{{ url_for('rate_game',
-                                game_id=game.id) }}"
-              method="POST">
+        <!-- Change rate_game to match def rate(game_id) in app.py -->
+        <form action="{{ url_for('rate', game_id=game.id) }}" method="POST">
 
 
             <div class="star-rating">

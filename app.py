@@ -96,7 +96,7 @@ review_model = api.model(
 
 @app.route("/")
 def home():
-    return redirect(url_for("login"))
+    return redirect(url_for("dashboard"))
 
 
 # ==================================================
@@ -222,9 +222,6 @@ def register():
 
 @app.route("/dashboard")
 def dashboard():
-
-    if "user_id" not in session:
-        return redirect(url_for("login"))
 
     try:
 

@@ -99,6 +99,11 @@ def home():
     return redirect(url_for("dashboard"))
 
 
+@app.route("/api/index")
+def vercel_index():
+    return redirect(url_for("dashboard"))
+
+
 # ==================================================
 # LOGIN
 # ==================================================

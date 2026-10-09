@@ -1,0 +1,155 @@
+<html>
+
+<head>
+
+    <title>GameRate - Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<nav class="navbar">
+
+    <div class="nav-logo">
+        🎮 GameRate
+    </div>
+
+    <div class="nav-links">
+
+        <a href="{{ url_for('dashboard') }}">
+            Home
+        </a>
+
+        <span>
+            Hi, {{ username }} 👋
+        </span>
+
+        <a href="{{ url_for('logout') }}"
+           class="logout-btn">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<div class="hero">
+
+    <h1>
+        Discover & Rate Your Favorite Games 🎮
+    </h1>
+
+    <p>
+        Find games, share your ratings and read reviews.
+    </p>
+
+
+    <form action="{{ url_for('dashboard') }}"
+          method="GET"
+          class="search-box">
+
+        <input type="text"
+               name="search"
+               value="{{ search }}"
+               placeholder="Search games or genres...">
+
+        <button type="submit">
+            🔍 Search
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="container">
+
+    <h2 class="section-title">
+        Popular Games
+    </h2>
+
+
+    <div class="game-grid">
+
+        {% for game in games %}
+
+        <div class="game-card">
+
+            <div class="game-image">
+
+                <span class="game-icon">
+                    🎮
+                </span>
+
+            </div>
+
+
+            <div class="game-content">
+
+                <h3>
+                    {{ game.name }}
+                </h3>
+
+                <span class="genre">
+                    {{ game.genre }}
+                </span>
+
+                <p>
+                    {{ game.description }}
+                </p>
+
+
+                <div class="rating">
+
+                    ⭐
+
+                    <strong>
+                        {{ "%.1f"|format(game.rating|float) }}
+                    </strong>
+
+                    / 5
+
+                    <span class="review-count">
+                        ({{ game.review_count }} reviews)
+                    </span>
+
+                </div>
+
+
+                <a href="{{ url_for('game_details',
+                                    game_id=game.id) }}"
+                   class="rate-button">
+
+                    View & Rate
+
+                </a>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="no-games">
+
+            <h3>No games found 😔</h3>
+
+            <p>
+                Try another search.
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

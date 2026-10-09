@@ -1,10 +1,293 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_restx import Api, Resource, fields
+
 import mysql.connector
 import os
+from dotenv import load_dotenv
 
-app = Flask(__name__)
+load_dotenv()
 
-# Secret key
+import os
+app = Flask(__name__, template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates"))
+api = Api(app, title="GameRate API", version="1.0", doc="/swagger/")
+review_model = api.model("Review", {
+    "user_id": fields.Integer(required=True),
+    "game_id": fields.Integer(required=True),
+    "rating": fields.Float(
+    required=True,
+    min=1,
+    max=5,
+    description="Game rating from 1 to 5"
+),
+    "review": fields.String(required=True)
+})
+@api.route("/users")
+class Users(Resource):
+    def get(self):
+        db = None
+        cursor = None
+
+        try:
+            db = get_db_connection()
+            cursor = db.cursor(dictionary=True)
+
+            cursor.execute("""
+                SELECT id, username, email
+                FROM users
+            """)
+
+            users = cursor.fetchall()
+
+            return users, 200
+
+        except mysql.connector.Error as error:
+            return {
+                "message": "Database error",
+                "error": str(error)
+            }, 500
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if db:
+                db.close()
+@api.route("/reviews/<int:review_id>")
+class ReviewById(Resource):
+
+    @api.expect(review_model)
+    def put(self, review_id):
+        data = request.get_json()
+
+        db = None
+        cursor = None
+
+        try:
+            db = get_db_connection()
+            cursor = db.cursor()
+
+            cursor.execute("""
+                UPDATE reviews
+                SET user_id = %s,
+                    game_id = %s,
+                    rating = %s,
+                    review = %s
+                WHERE id = %s
+            """, (
+                data["user_id"],
+                data["game_id"],
+                data["rating"],
+                data["review"],
+                review_id
+            ))
+
+            db.commit()
+
+            if cursor.rowcount == 0:
+                return {"message": "Review not found"}, 404
+
+            return {"message": "Review updated successfully"}, 200
+
+        except mysql.connector.Error as error:
+            return {
+                "message": "Database error",
+                "error": str(error)
+            }, 500
+
+        finally:
+            if cursor:
+                cursor.close()
+            if db:
+                db.close()
+    def delete(self, review_id):
+        db = None
+        cursor = None
+
+        try:
+            db = get_db_connection()
+            cursor = db.cursor()
+
+            cursor.execute("""
+                DELETE FROM reviews
+                WHERE id = %s
+            """, (review_id,))
+
+            db.commit()
+
+            if cursor.rowcount == 0:
+                return {"message": "Review not found"}, 404
+
+            return {"message": "Review deleted successfully"}, 200
+
+        except mysql.connector.Error as error:
+            return {
+                "message": "Database error",
+                "error": str(error)
+            }, 500
+
+        finally:
+            if cursor:
+                cursor.close()
+            if db:
+                db.close()
+game_model = api.model("Game", {
+    "name": fields.String(required=True),
+    "genre": fields.String(required=True),
+    "description": fields.String(required=True)
+})             
+@api.route("/games")
+class Games(Resource):
+    def get(self):
+        db = None
+        cursor = None
+
+        try:
+            db = get_db_connection()
+            cursor = db.cursor(dictionary=True)
+
+            cursor.execute("""
+                SELECT id, name, genre, description
+                FROM games
+            """)
+
+            games = cursor.fetchall()
+
+            return games, 200
+
+        except mysql.connector.Error as error:
+            return {
+                "message": "Database error",
+                "error": str(error)
+            }, 500
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if db:
+                db.close()
+
+
+@api.route("/games/<int:game_id>")
+class GameById(Resource):
+
+    @api.expect(game_model)
+    def put(self, game_id):
+        data = request.get_json()
+
+        db = None
+        cursor = None
+
+        try:
+            db = get_db_connection()
+            cursor = db.cursor()
+
+            cursor.execute("""
+                UPDATE games
+                SET name = %s,
+                    genre = %s,
+                    description = %s
+                WHERE id = %s
+            """, (
+                data["name"],
+                data["genre"],
+                data["description"],
+                game_id
+            ))
+
+            db.commit()
+
+            if cursor.rowcount == 0:
+                return {"message": "Game not found"}, 404
+
+            return {"message": "Game updated successfully"}, 200
+
+        except mysql.connector.Error as error:
+            return {
+                "message": "Database error",
+                "error": str(error)
+            }, 500
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if db:
+                db.close()
+@api.route("/reviews")
+class Reviews(Resource):
+    def get(self):
+        db = None
+        cursor = None
+
+        try:
+            db = get_db_connection()
+            cursor = db.cursor(dictionary=True)
+
+            cursor.execute("""
+    SELECT r.id, r.user_id, r.game_id,
+           r.rating, r.review,
+           DATE_FORMAT(r.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,
+           u.username
+    FROM reviews r
+    JOIN users u ON r.user_id = u.id
+    ORDER BY r.created_at DESC
+""")
+            reviews = cursor.fetchall()
+
+            return reviews, 200
+
+        except mysql.connector.Error as error:
+            return {
+                "message": "Database error",
+                "error": str(error)
+            }, 500
+
+        finally:
+            if cursor:
+                cursor.close()
+
+            if db:
+                db.close()
+    @api.expect(review_model)
+    def post(self):
+        data = request.get_json()
+
+        db = None
+        cursor = None
+
+        try:
+            db = get_db_connection()
+            cursor = db.cursor()
+
+            cursor.execute("""
+                INSERT INTO reviews (user_id, game_id, rating, review)
+                VALUES (%s, %s, %s, %s)
+            """, (
+                data["user_id"],
+                data["game_id"],
+                data["rating"],
+                data["review"]
+            ))
+
+            db.commit()
+
+            return {
+                "message": "Review added successfully"
+            }, 201
+
+        except mysql.connector.Error as error:
+            return {
+                "message": "Database error",
+                "error": str(error)
+            }, 500
+
+        finally:
+            if cursor:
+                cursor.close()
+            if db:
+                db.close()
+#Secret key
 app.secret_key = os.environ.get(
     "SECRET_KEY",
     "gkb_project_secret_key"
@@ -15,14 +298,20 @@ app.secret_key = os.environ.get(
 # DATABASE CONNECTION - TiDB CLOUD
 # =========================================================
 
+
 def get_db_connection():
-    return mysql.connector.connect(
-        host=os.environ.get("TIDB_HOST"),
-        port=int(os.environ.get("TIDB_PORT", "4000")),
-        user=os.environ.get("TIDB_USER"),
-        password=os.environ.get("TIDB_PASSWORD"),
-        database=os.environ.get("TIDB_DATABASE")
-    )
+    try:
+        return mysql.connector.connect(
+            host=os.environ.get("TIDB_HOST"),
+            port=int(os.environ.get("TIDB_PORT", "4000")),
+            user=os.environ.get("TIDB_USER"),
+            password=os.environ.get("TIDB_PASSWORD"),
+            database=os.environ.get("TIDB_DATABASE"),
+            ssl_ca=os.environ.get("SSL_CA"),
+        )
+    except mysql.connector.Error as e:
+        print("TIDB CONNECTION ERROR:", repr(e), flush=True)
+        raise
 
 
 # =========================================================
